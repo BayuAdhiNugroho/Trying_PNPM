@@ -8,6 +8,7 @@ export async function authenticate(
   formData: FormData,
 ) {
   try {
+    // Langsung set cookie aja
     const cookieStore = await cookies();
     cookieStore.set('auth_token', 'logged_in', {
       httpOnly: true,
@@ -15,14 +16,22 @@ export async function authenticate(
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
-    redirect('/dashboard');
   } catch (error) {
+    console.error('Authentication error:', error);
     return 'An error occurred. Please try again.';
   }
+  
+  // Redirect di luar try-catch
+  redirect('/dashboard');
 }
 
 export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete('auth_token');
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('auth_token');
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+  
   redirect('/');
 }
